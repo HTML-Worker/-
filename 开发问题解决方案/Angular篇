@@ -1,0 +1,60 @@
+# Angular中遇到的问题
+
+###  阻止事件冒泡
+    <body ng-controller="MainCtrl">
+       <div ng-click="goUrl('http://qiaole.sinaapp.com')">
+         <button type="button" ng-click="doSomeSth();$event.stopPropagation();">button</button>
+       </div>
+    </body>
+
+---
+
+### 生成cookies，并读取解析
+
+      //生成cookise信息，有效时间为一天
+      var expireDate = new Date();
+      expireDate.setDate(expireDate.getDate() + 1);
+      $cookies.putObject(un, {
+          name: un,
+          password: psd,
+          remember: chkLogin,
+          autoLogin: chkLogin,
+          time: new Date().getTime()
+      }, {'expires': expireDate.toUTCString() });
+
+      //读取cookies信息并获取最近时间的一个登录信息
+      indexService.getCookies = function () {
+            var msgArray = [];
+            var msgLast;
+            var data = $cookies.getAll();
+            for (var i in data) {
+                msgArray.push(data[i]);
+            }
+            //如果cookies为空则输出空
+            if (msgArray.length <= 3) {
+                return {
+                    name: "",
+                    password: "",
+                    remember: false,
+                    autoLogin: false,
+                    time: ""
+                };
+            }
+            else {
+                msgLast = JSON.parse(msgArray[0]);
+                for (var i=0; i<msgArray.length-3; i++) {
+                    if (msgLast.time < JSON.parse(msgArray[i]).time) {
+                        msgLast = JSON.parse(msgArray[i]);
+                    }
+                }
+                return msgLast;
+            }
+        };
+
+---
+
+### 页面跳转
+
+问题描述：写在services中出问题，不跳转，写在controller中可以
+
+    // location.pathname = "";  //修改部分

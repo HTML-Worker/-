@@ -1,0 +1,129 @@
+### 原生js存取cookies问题
+
+格式：
+
+    var exp = new Date();
+    exp.setTime(exp.getTime() + 60 * 2000);//过期时间 2分钟
+    document.cookie = un + "=" + JSON.stringify(cookieData) + ";expires = " + exp.toUTCString();
+
+读取：
+
+    var login = function (ref) {
+        var getRef = ref;
+        var msgArray = [];
+        var msgLast;
+        var data = document.cookie;
+        var explorer = navigator.userAgent;
+
+        //将字符串以 ； 间隔存成数组
+        msgArray = data.split(";");
+
+        //判断浏览器类型,获取最后一次登录信息
+        //firefox
+        if (explorer.indexOf("Firefox") >= 0) {
+            if (msgArray[0] === "") {
+                return {
+                    name: "",
+                    password: "",
+                    remember: false,
+                    autoLogin: false,
+                    endTime: ""
+                };
+            }
+            else {
+                msgLast = JSON.parse(msgArray[0].split("=")[1]);
+                for (var i=0; i<msgArray.length; i++) {
+                    if (msgLast.endTime < JSON.parse(msgArray[i].split("=")[1]).endTime) {
+                        msgLast = JSON.parse(msgArray[i].split("=")[1]);
+                    }
+                }
+
+                //判断跳转来源
+                if (getRef == "") {
+                    return msgLast;
+                }
+                else {
+                    msgLast.autoLogin = false;
+                    return msgLast;
+                }
+            }
+        }
+        //Chrome
+        else if(explorer.indexOf("Chrome") >= 0){
+            //如果cookies为空则输出空
+            if (msgArray.length <= 3) {
+                return {
+                    name: "",
+                    password: "",
+                    remember: false,
+                    autoLogin: false,
+                    endTime: ""
+                };
+            }
+            else {
+                msgLast = JSON.parse(msgArray[3].split("=")[1]);
+                for (var i=3; i<msgArray.length; i++) {
+                    if (msgLast.endTime < JSON.parse(msgArray[i].split("=")[1]).endTime) {
+                        msgLast = JSON.parse(msgArray[i].split("=")[1]);
+                    }
+                }
+                //判断跳转来源
+                if (getRef == "") {
+                    return msgLast;
+                }
+                else {
+                    msgLast.autoLogin = false;
+                    return msgLast;
+                }
+            }
+        }
+        //Opera
+        else if(explorer.indexOf("Opera") >= 0){
+            // alert("Opera");
+        }
+        //Safari
+        else if(explorer.indexOf("Safari") >= 0){
+            // alert("Safari");
+        }
+        //Netscape
+        else if(explorer.indexOf("Netscape")>= 0) {
+            // alert("Netscape");
+        }
+        //IE
+        else {
+            if (msgArray[0] === "") {
+                return {
+                    name: "",
+                    password: "",
+                    remember: false,
+                    autoLogin: false,
+                    endTime: ""
+                };
+            }
+            else {
+                msgLast = JSON.parse(msgArray[0].split("=")[1]);
+                for (var i=0; i<msgArray.length; i++) {
+                    if (msgLast.endTime < JSON.parse(msgArray[i].split("=")[1]).endTime) {
+                        msgLast = JSON.parse(msgArray[i].split("=")[1]);
+                    }
+                }
+                //判断跳转来源
+                if (getRef == "") {
+                    return msgLast;
+                }
+                else {
+                    msgLast.autoLogin = false;
+                    return msgLast;
+                }
+            }
+        }
+    };
+
+
+注意事项：
+
+";expires = " 必须要有 = 号；
+
+chrom存的cookie比IE和firefix下的多三条属性读取时不同；
+
+使用cookies最好用原生js，angular版本间cookies操作差异很大；
