@@ -124,6 +124,19 @@
 
 ";expires = " 必须要有 = 号；
 
-chrom存的cookie比IE和firefix下的多三条属性读取时不同；
-
 使用cookies最好用原生js，angular版本间cookies操作差异很大；
+
+### 跨域post请求（添加请求头的方法）
+
+    $http({
+        method: "post",
+        url: logoutUrl,
+        async: false,
+        beforeSend : function (xhr) {
+            xhr.setRequestHeader("X-Request-Token", msgLast.ticket);
+        }
+    }).success(function (req) {
+        msgLast.ticket = "";
+        exp.setTime(exp.getTime() + globalConfig.rememberLoginDuration);//过期时间
+        document.cookie = msgLast.name + "=" + JSON.stringify(msgLast) + ";expires = " + exp.toUTCString();
+    });

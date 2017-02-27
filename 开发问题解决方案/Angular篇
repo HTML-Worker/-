@@ -53,8 +53,25 @@
 
 ---
 
-### 页面跳转
+### 添加键盘事件
 
-问题描述：写在services中出问题，不跳转，写在controller中可以
+    controller文件
+    /**
+    * 键盘enter键控制登录
+    * @param $event
+    * @param username
+    * @param password
+    */
+    $scope.keyEvent = function ($event, username, password) {
+       if($event.keyCode==13){//回车
+           loginService.loginCheck(username, password).then(function (result) {
+               if (true === result) {
+                   location.href = "/";
+               }
+           });
+       }
+    };
 
-    // location.pathname = "";  //修改部分
+    html文件：
+
+    ng-keypress="keyEvent($event, login.username, login.password)"
